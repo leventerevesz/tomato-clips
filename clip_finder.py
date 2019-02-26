@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #   * add more functionality
 
 # Read the file in color mode.
-img = cv.imread('images/tomato3.jpg', cv.IMREAD_COLOR)
+img = cv.imread('images/tomato2.jpg', cv.IMREAD_COLOR)
 
 # The default color space is BGR, we have to switch to RGB.
 img = cv.cvtColor(img, cv.COLOR_BGR2RGB)      # RGB to display
