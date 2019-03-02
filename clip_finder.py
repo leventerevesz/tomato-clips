@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #   * add more functionality
 
 # Read the file in color mode.
-img = cv.imread('images/tomato1.jpg', cv.IMREAD_COLOR)
+img = cv.imread('images/tomato4.jpg', cv.IMREAD_COLOR)
 img = cv.GaussianBlur(img,(7,7),0)
 
 # Blob detection parameters
@@ -34,7 +34,12 @@ params.minInertiaRatio = 0.5
 # Filter by Distance between Blobs
 params.minDistBetweenBlobs = 90
 
-detector = cv.SimpleBlobDetector_create(params)
+# OpenCV version check for BlobDetection
+ver = (cv.__version__).split('.')
+if int(ver[0]) < 3:
+    detector = cv.SimpleBlobDetector(params)
+else:
+    detector = cv.SimpleBlobDetector_create(params)
 
 # The default color space is BGR, we have to switch to RGB.
 img = cv.cvtColor(img, cv.COLOR_BGR2RGB)      # RGB to display
@@ -54,7 +59,20 @@ reversemask=255-mask_hsv # invert mask for Blob Detection
 
 # Detect blobs
 keypoints = detector.detect(reversemask)
-im_with_keypoints = cv.drawKeypoints(reversemask, keypoints, np.array([]), (255,0,0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+im_with_keypoints = cv.drawKeypoints(img, keypoints, np.array([]), (255,0,0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+# Write keypoints to file
+i=0
+with open('blobs/keypoints.txt', 'w') as fw:
+    for point in keypoints:
+        x=round(point.pt[0],2)
+        y=round(point.pt[1],2)
+        s=round(point.size,2)
+        i += 1
+        fw.write('%i: x: %s\t y: %s\t diam: %s\n' %(i, x, y, s) )
+
+# Save image with detected Blobs
+cv.imwrite('blobs/result.jpg', cv.cvtColor(im_with_keypoints, cv.COLOR_RGB2BGR))
 
 # Display result with Matplotlib
 plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='gray', edgecolor='k')
@@ -68,4 +86,5 @@ plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='gray', edgecolor='k')
 #plt.subplot(2, 2, 4)
 plt.imshow(im_with_keypoints)
 plt.show()
-print(len(keypoints))
+
+#print(len(keypoints))
