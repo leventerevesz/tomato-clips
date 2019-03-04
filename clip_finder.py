@@ -86,7 +86,7 @@ for cnt in contours:
         rect = cv.minAreaRect(cnt)
         box = cv.boxPoints(rect)
         box = np.int0(box)
-        #cv.drawContours(img,[box],0,(255,0,0),5)
+        cv.drawContours(img,[box],0,(255,0,0),5)
 
 # Filtering out smaller rectangles
 for i in range (3):
