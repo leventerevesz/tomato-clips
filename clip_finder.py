@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 #   * add more functionality
 
 # Read the file in color mode.
-img = cv.imread('images/tomato4.jpg', cv.IMREAD_COLOR)
+img = cv.imread('images/tomato1.jpg', cv.IMREAD_COLOR)
 blur = cv.GaussianBlur(img,(7,7),0) # blur for filtering out little blue pixels
 
 # Get image width and height
@@ -60,6 +60,7 @@ result_rgb = cv.bitwise_and(img, img, mask=mask_rgb)
 result_hsv = cv.bitwise_and(hsv_img, hsv_img, mask=mask_hsv)
 
 reversemask=255-mask_hsv # invert mask for Blob Detection
+rmask=reversemask
 
 # Dilate (white ^) and Erode (black ^)
 dkernel = np.ones((3,3),np.uint8)
@@ -135,7 +136,8 @@ for rect in final:
 
 # Detect blobs
 keypoints = detector.detect(reversemask)
-im_with_keypoints = cv.drawKeypoints(blur, keypoints, np.array([]), (255,0,0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+im_with_keypoints = cv.drawKeypoints(reversemask, keypoints, np.array([]), (255,0,0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+#im_with_keypoints2 = cv.drawKeypoints(img, keypoints, np.array([]), (255,0,0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 # Write keypoints to file
 i=0
@@ -152,15 +154,15 @@ cv.imwrite('results/rect.jpg', cv.cvtColor(img, cv.COLOR_RGB2BGR))
 cv.imwrite('results/blobs.jpg', cv.cvtColor(im_with_keypoints, cv.COLOR_RGB2BGR))
 
 # Display result with Matplotlib
-plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='gray', edgecolor='k')
+plt.figure(num=None, figsize=(14, 6), dpi=80, facecolor='white', edgecolor='k')
 
 #plt.subplot(2, 2, 1)
 #plt.imshow(mask_rgb, cmap="gray")
 #plt.subplot(2, 2, 2)
 #plt.imshow(result_rgb)
-#plt.subplot(2, 2, 3)
-#plt.imshow(mask_hsv, cmap="gray")
-#plt.subplot(2, 2, 4)
-#plt.imshow(im_with_keypoints)
+#plt.subplot(1, 2, 1)
+#plt.imshow(rmask)
+#plt.subplot(1, 2, 2)
+#plt.imshow(erosion)
 plt.imshow(img)
 plt.show()

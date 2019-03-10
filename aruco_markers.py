@@ -17,7 +17,7 @@ def make_markers():
         img = aruco.drawMarker(aruco_dict,i, 600)
         plt.imshow(img, cmap = mpl.cm.gray, interpolation = "nearest")
         ax.axis("off")
-    plt.savefig("results//ArUco_Markers.pdf")
+    plt.savefig("results/ArUco_Markers.pdf")
     plt.show()
 
 make_markers()

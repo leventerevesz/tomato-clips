@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
-img = cv.imread('images/stem8.jpg')
+img = cv.imread('images/stem7.jpg')
 img2=img.copy()
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 edges = cv.Canny(gray,0,400, apertureSize=3)
@@ -44,5 +44,5 @@ plt.title('Normal'), plt.xticks([]), plt.yticks([])
 #plt.subplot(326),plt.imshow(sobely,cmap = 'gray')
 #plt.title('Sobel Y'), plt.xticks([]), plt.yticks([])
 
-
+cv.imwrite('results/stem.jpg', cv.cvtColor(img2, cv.COLOR_RGB2BGR))
 plt.show()
