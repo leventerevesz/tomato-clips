@@ -35,7 +35,7 @@ while True:
         break
     elif k==ord('s'):
         i+=1
-        cv.imwrite('images/aruco/ar_test'+str(i)+'.jpg',dst)
+        cv.imwrite('images/aruco/ar_test'+str(i)+'.jpg',frame)
         continue
     
 cap.release()
