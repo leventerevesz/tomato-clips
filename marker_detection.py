@@ -1,69 +1,73 @@
 import cv2 as cv
 import numpy as np
 import cv2.aruco as aruco
+import pandas as pd
 
-def draw(img, corners, imgpts):
-    corner = tuple(corners[0].ravel())
-    img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
-    return img
+markerEdge=0.0273  # ArUco marker edge length in meters
 
 cap = cv.VideoCapture(1)
+
+# Get the calibrated camera matrices
 with np.load('camcalib.npz') as X:
         mtx = X['mtx']
         dist = X['dist']
 
 while True:
     _, frame = cap.read()
-    
-    #img = cv.imread('images/calibration/calib_11.jpg')
+
+    #img = cv.imread('images/aruco/distorted/ar_test4.jpg')    
     h, w = frame.shape[:2]
     newcameramtx, roi=cv.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
 
-    # undistort
-    dst = cv.undistort(frame, mtx, dist, None, newcameramtx)
+    # Undistort
+    udst = cv.undistort(frame, mtx, dist, None, newcameramtx)
 
-    # crop the image
+    # Crop image
     x,y,w,h = roi
-    dst = dst[y:y+h, x:x+w]
-    #cv.imshow('undistorted',dst)
+    udst = udst[y:y+h, x:x+w]
+    #cv.imshow('undistorted',udst)
 
-    gray = cv.cvtColor(dst, cv.COLOR_BGR2GRAY)
+    gray = cv.cvtColor(udst, cv.COLOR_BGR2GRAY)
     aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
     parameters = aruco.DetectorParameters_create()
 
-    #lists of ids and the corners beloning to each id
+    # Detecting markers: get corners and IDs
     corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
-    font = cv.FONT_HERSHEY_SIMPLEX #font for displaying text (below)
-
+    # Font for text display
+    font = cv.FONT_HERSHEY_SIMPLEX
 
     if np.all(ids != None):
-
-        rvec, tvec ,_ = aruco.estimatePoseSingleMarkers(corners, 0.05, mtx, dist) #Estimate pose of each marker and return the values rvet and tvec---different from camera coefficients
+        ### IDs found
+        # Pose estimation with marker edge length
+        rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, markerEdge, mtx, dist)
         
         for i in range(0, ids.size):
-            aruco.drawAxis(dst, mtx, dist, rvec[i], tvec[i], 0.1)  # Draw Axis
-        aruco.drawDetectedMarkers(dst, corners) #Draw A square around the markers
+            aruco.drawAxis(udst, mtx, dist, rvec[i], tvec[i], 0.1)  # Draw axis
+            
+            # Z component of tvec to string
+            transl=tvec.reshape(len(tvec),3)
+            strg = str(ids[i][0]) + ' z=' + str(round(transl[i][2],3))
 
+            # Writing text to 4th corner
+            cv.putText(udst, strg, (int(corners[i][0][2][0]),int(corners[i][0][2][1])), font, 0.5, (255,0,0),1,cv.LINE_AA)
 
-        ###### DRAW ID #####
-        strg = ''
-        for i in range(0, ids.size):
-            strg += str(ids[i][0])+', '
+        # Draw square around the markers
+        aruco.drawDetectedMarkers(udst, corners)
 
-        cv.putText(dst, "Id: " + strg, (0,64), font, 1, (0,255,0),2,cv.LINE_AA)
-
-
+        # Write to txt
+        #data=pd.DataFrame(data=tvec.reshape(len(tvec),3),columns=["tx","ty","tz"],index=ids.flatten())
+        #data.index.name="markers"
+        #data.sort_index(inplace=True)
+        #np.savetxt("data.txt",data)
     else:
-        ##### DRAW "NO IDS" #####
-        cv.putText(dst, "No Ids", (0,64), font, 1, (0,255,0),2,cv.LINE_AA)
+        ### No IDs found
+        cv.putText(udst, "No Ids", (0,64), font, 1, (0,0,255),2,cv.LINE_AA)
 
     
-    cv.imshow('markers', dst)
+    cv.imshow('markers', udst)
     if cv.waitKey(1) == 27: 
-        break  # esc to quit
-    
+        break  # Esc to quit
+
 cap.release()
 cv.destroyAllWindows()
