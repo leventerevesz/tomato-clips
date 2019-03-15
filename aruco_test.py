@@ -1,13 +1,5 @@
 import cv2 as cv
 import numpy as np
-import cv2.aruco as aruco
-
-def draw(img, corners, imgpts):
-    corner = tuple(corners[0].ravel())
-    img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
-    img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
-    return img
 
 cap = cv.VideoCapture(1)
 with np.load('camcalib.npz') as X:
