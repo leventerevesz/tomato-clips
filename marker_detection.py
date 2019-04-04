@@ -1,11 +1,11 @@
 import cv2 as cv
 import numpy as np
 import cv2.aruco as aruco
-#import pandas as pd # szükségtelen
+import time
 
 def marker_detection():
     markerEdge=0.0273  # ArUco marker edge length in meters
-    cap = cv.VideoCapture(1)
+    cap = cv.VideoCapture(0)
     
     # Get the calibrated camera matrices
     with np.load('camcalib.npz') as X:
@@ -55,19 +55,19 @@ def marker_detection():
             # Draw square around the markers
             aruco.drawDetectedMarkers(udst, corners)
 
-            # Write to txt
-            #data=pd.DataFrame(data=tvec.reshape(len(tvec),3),columns=["tx","ty","tz"],index=ids.flatten())
-            #data.index.name="markers"
-            #data.sort_index(inplace=True)
-            #np.savetxt("data.txt",data)
         else:
             ### No IDs found
             cv.putText(udst, "No Ids", (0,64), font, 1, (0,0,255),2,cv.LINE_AA)
 
         
         cv.imshow('markers', udst)
-        if cv.waitKey(1) == 27: 
-            break  # Esc to quit
+        k=cv.waitKey(1)
+        if k==27: # Esc to quit
+            break
+        elif k==ord('s'): # S to save
+            timestr = time.strftime("%Y%m%d%H%M%S")
+            cv.imwrite('results/marker_'+timestr+'.jpg',udst)
+            continue
 
     cap.release()
     cv.destroyAllWindows()
