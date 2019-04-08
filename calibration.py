@@ -8,7 +8,11 @@ def calibration():
 
     cap = cv.VideoCapture(0)
     db=0
-    chbEdgeLength=0.0254 #in meters
+    inp = input("chessboardEdgeLength (default=0.0254): ")
+    if inp == "" or inp in "dD" or inp.lower() == "default":
+        chbEdgeLength = 0.0254
+    else:
+        chbEdgeLength = float(inp)
 
     font = cv.FONT_HERSHEY_SIMPLEX
     start=True
