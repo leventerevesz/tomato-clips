@@ -42,6 +42,9 @@ def marker_detection():
             # Pose estimation with marker edge length
             rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, markerEdge, mtx, dist)
             
+            # array of [x, y, z] coordinates of the markers
+            transl=tvec.reshape(len(tvec),3)
+
             # Error map: List to store z coordinates
             markers_z_list = []
 
@@ -49,9 +52,8 @@ def marker_detection():
                 aruco.drawAxis(udst, mtx, dist, rvec[i], tvec[i], 0.1)  # Draw axis
                 
                 # Z component of tvec to string
-                transl=tvec.reshape(len(tvec),3)
                 strg = str(ids[i][0]) + ' z=' + str(round(transl[i][2],3))
-                
+
                 # Store z coordinates for error map
                 markers_z_list.append(str(round(transl[i][2],3)))
 
@@ -75,8 +77,21 @@ def marker_detection():
             cv.imwrite('results/marker_'+timestr+'.jpg',udst)
             continue
         elif k==ord('z'): # Z to save Z coordinates
-            with open("results/Z_coords.txt", "a") as z_coords:
+            with open("results/Z_coords.csv", "a") as z_coords:
                 z_coords.write(','.join(markers_z_list) + "\n")
+            print("Saved z coords to Z_coords.csv")
+            continue
+        elif k==ord('g'): # G to print/save coordinates
+            with open("results/marker_coords.csv", "w") as marker_coords:
+                marker_coords.write("id, x, y, z\n")
+                for i in range(len(transl)):
+                    # [id, x, y, z]
+                    coords_strings = [str(round(e,3)) for e in transl[i]]
+                    coords_strings.insert(0, str(ids[i][0]))
+
+                    marker_coords.write(", ".join(coords_strings) + "\n")
+            print("Saved coords to marked_coords.csv")
+            continue
 
     cap.release()
     cv.destroyAllWindows()
