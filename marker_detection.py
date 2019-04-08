@@ -42,12 +42,18 @@ def marker_detection():
             # Pose estimation with marker edge length
             rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, markerEdge, mtx, dist)
             
+            # Error map: List to store z coordinates
+            markers_z_list = []
+
             for i in range(0, ids.size):
                 aruco.drawAxis(udst, mtx, dist, rvec[i], tvec[i], 0.1)  # Draw axis
                 
                 # Z component of tvec to string
                 transl=tvec.reshape(len(tvec),3)
                 strg = str(ids[i][0]) + ' z=' + str(round(transl[i][2],3))
+                
+                # Store z coordinates for error map
+                markers_z_list.append(str(round(transl[i][2],3)))
 
                 # Writing text to 4th corner
                 cv.putText(udst, strg, (int(corners[i][0][2][0]),int(corners[i][0][2][1])), font, 0.5, (255,0,0),1,cv.LINE_AA)
@@ -68,6 +74,9 @@ def marker_detection():
             timestr = time.strftime("%Y%m%d%H%M%S")
             cv.imwrite('results/marker_'+timestr+'.jpg',udst)
             continue
+        elif k==ord('z'): # Z to save Z coordinates
+            with open("results/Z_coords.txt", "a") as z_coords:
+                z_coords.write(','.join(markers_z_list) + "\n")
 
     cap.release()
     cv.destroyAllWindows()
