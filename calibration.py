@@ -6,7 +6,7 @@ from playsound import playsound
 def calibration():
     import glob
 
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(1)
     db=0
     inp = input("chessboardEdgeLength (default=0.0254): ")
     if inp == "" or inp in "dD" or inp.lower() == "default":
@@ -21,7 +21,7 @@ def calibration():
     # termination criteria
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     
-    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(8,5,0)
     objp = np.zeros((6*9,3), np.float32)
     objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)*chbEdgeLength
     
@@ -31,9 +31,11 @@ def calibration():
 
     while True:
         _,frame=cap.read()
-        gray = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
-        # find the chess board corners
-        ret, corners = cv.findChessboardCorners(gray, (9,6),None)
+
+        if calib==False:
+            gray = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+            # find the chess board corners
+            ret, corners = cv.findChessboardCorners(gray, (9,6),None)
         
         if db<20:
             # if found, add object points, image points (after refining them)

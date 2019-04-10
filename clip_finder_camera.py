@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def clip_finder_camera():
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(1)
 
     i=0
     while True:

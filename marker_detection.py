@@ -5,7 +5,7 @@ import time
 
 def marker_detection():
     markerEdge=0.0273  # ArUco marker edge length in meters
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(1)
     
     # Get the calibrated camera matrices
     with np.load('camcalib.npz') as X:
@@ -72,16 +72,16 @@ def marker_detection():
         k=cv.waitKey(1)
         if k==27: # Esc to quit
             break
-        elif k==ord('s'): # S to save
-            timestr = time.strftime("%Y%m%d%H%M%S")
+        elif k==ord('s') or k==ord('S'): # S to save
+            timestr = time.strftime("%Y%m%d_%H%M%S")
             cv.imwrite('results/marker_'+timestr+'.jpg',udst)
             continue
-        elif k==ord('z'): # Z to save Z coordinates
+        elif k==ord('z') or k==ord('Z'): # Z to save Z coordinates
             with open("results/Z_coords.csv", "a") as z_coords:
                 z_coords.write(','.join(markers_z_list) + "\n")
             print("Saved z coords to Z_coords.csv")
             continue
-        elif k==ord('g'): # G to print/save coordinates
+        elif k==ord('g') or k==ord('G'): # G to print/save coordinates
             with open("results/marker_coords.csv", "w") as marker_coords:
                 marker_coords.write("id, x, y, z\n")
                 for i in range(len(transl)):
