@@ -6,7 +6,10 @@ from playsound import playsound
 def calibration():
     import glob
 
-    cap = cv.VideoCapture(1)
+    cap = cv.VideoCapture(0)
+    cap.set(3,960) #set camera resolution
+    cap.set(4,720)
+
     db=0
     inp = input("chessboardEdgeLength (default=0.0254): ")
     if inp == "" or inp in "dD" or inp.lower() == "default":
