@@ -66,6 +66,20 @@ def marker_detection():
             # Draw square around the markers
             aruco.drawDetectedMarkers(udst, corners)
 
+            # Draw direction arrow for the first marker found
+            # (ideally only 1 marker is seen while testing this)
+            radius = 0.05
+            x = transl[0][0]
+            xstr = str(round(x,3))
+            if x < -radius :
+                arrow = "-->"
+            elif x > radius :
+                arrow = "<--"
+            else:
+                arrow = "OK"
+            
+            cv.putText(udst, arrow + "  x=" + xstr, (0,64), font, 1, (0,255,0),2,cv.LINE_AA)
+
         else:
             ### No IDs found
             cv.putText(udst, "No Ids", (0,64), font, 1, (0,0,255),2,cv.LINE_AA)
